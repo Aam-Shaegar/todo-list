@@ -11,7 +11,7 @@ env-down:
 env-cleanup:
 	@read -p "Clean all volume env files? [y/n]: " ans; \
 	if [ "$$ans" = "y" ]; then \
-		docker compose down todo-app-postgres && \
+		docker compose down todo-app-postgres potr-forwarder && \
 		rm -rf out/pgdata && \
 		echo "Environment cleaned up."; \
 	else \
@@ -51,3 +51,9 @@ env-port-forward:
 
 env-port-close:
 	@docker compose down port-forwarder
+
+run:
+	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
+	export POSTGRES_HOST=localhost && \
+	go mod tidy && \
+	go run cmd/todoapp/main.go 
