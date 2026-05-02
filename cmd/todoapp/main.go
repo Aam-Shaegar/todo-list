@@ -8,7 +8,7 @@ import (
 	"syscall"
 
 	core_logger "github.com/Aam-Shaegar/todo-list/internal/core/logger"
-	core_postgres_pool "github.com/Aam-Shaegar/todo-list/internal/core/repository/postgres/pool"
+	core_pgx_pool "github.com/Aam-Shaegar/todo-list/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/Aam-Shaegar/todo-list/internal/core/transport/http/middleware"
 	core_http_server "github.com/Aam-Shaegar/todo-list/internal/core/transport/http/server"
 	users_postgres_repositpory "github.com/Aam-Shaegar/todo-list/internal/features/users/repository/postgres"
@@ -36,8 +36,9 @@ func main() {
 	defer logger.Close()
 
 	logger.Debug("initializing postgres connetcion pool")
-	pool, err := core_postgres_pool.NewConnectionPool(
-		core_postgres_pool.NewConfigMust(),
+
+	pool, err := core_pgx_pool.NewConnectionPool(
+		core_pgx_pool.NewConfigMust(),
 		ctx,
 	)
 
@@ -59,8 +60,8 @@ func main() {
 		logger,
 		core_http_middleware.RequestID(),
 		core_http_middleware.Logger(logger),
-		core_http_middleware.Panic(),
 		core_http_middleware.Trace(),
+		core_http_middleware.Panic(),
 	)
 
 	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
