@@ -11,7 +11,7 @@ env-down:
 env-cleanup:
 	@read -p "Clean all volume env files? [y/n]: " ans; \
 	if [ "$$ans" = "y" ]; then \
-		docker compose down todo-app-postgres potr-forwarder && \
+		docker compose down todo-app-postgres port-forwarder && \
 		rm -rf ${PROJECT_ROOT}/out/pgdata && \
 		echo "Environment cleaned up."; \
 	else \
