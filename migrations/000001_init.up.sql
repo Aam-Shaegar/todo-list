@@ -15,13 +15,13 @@ CREATE TABLE todoapp.tasks (
     version INTEGER NOT NULL DEFAULT 1,
     title VARCHAR(100) NOT NULL CHECK(char_length(title) BETWEEN 1 AND 100),
     description VARCHAR(1000) CHECK(char_length(description) <= 1000) DEFAULT '',
-    is_completed BOOLEAN NOT NULL DEFAULT FALSE,
+    completed BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     completed_at TIMESTAMPTZ,
     author_user_id INTEGER NOT NULL REFERENCES todoapp.users(id) ON DELETE CASCADE,
 
     CHECK (
-        (is_completed = FALSE AND completed_at IS NULL) OR
-        (is_completed = TRUE AND completed_at IS NOT NULL AND completed_at >= created_at)
+        (completed = FALSE AND completed_at IS NULL) OR
+        (completed = TRUE AND completed_at IS NOT NULL AND completed_at >= created_at)
     )
 );
