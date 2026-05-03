@@ -13,6 +13,9 @@ import (
 	core_pgx_pool "github.com/Aam-Shaegar/todo-list/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/Aam-Shaegar/todo-list/internal/core/transport/http/middleware"
 	core_http_server "github.com/Aam-Shaegar/todo-list/internal/core/transport/http/server"
+	statistics_postgres_repository "github.com/Aam-Shaegar/todo-list/internal/features/stats/repository/postgres"
+	statistics_service "github.com/Aam-Shaegar/todo-list/internal/features/stats/service"
+	statistics_transport_http "github.com/Aam-Shaegar/todo-list/internal/features/stats/transport/http"
 	tasks_postgres_repository "github.com/Aam-Shaegar/todo-list/internal/features/tasks/repository/postgres"
 	tasks_service "github.com/Aam-Shaegar/todo-list/internal/features/tasks/service"
 	tasks_transport_http "github.com/Aam-Shaegar/todo-list/internal/features/tasks/transport/http"
@@ -67,6 +70,11 @@ func main() {
 	tasksService := tasks_service.NewTasksService(tasksRepository)
 	tasksTransportHTTP := tasks_transport_http.NewTasksHTTPHandler(tasksService)
 
+	logger.Debug("initializing feature", zap.String("feature", "statistics"))
+	statisticsRepository := statistics_postgres_repository.NewStatisticsRepository(pool)
+	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
+	statisticsTransportHTTP := statistics_transport_http.NewStatisticsHTTPHandler(statisticsService)
+
 	logger.Debug("initializing http service")
 
 	httpServer := core_http_server.NewHTTPServer(
@@ -81,6 +89,7 @@ func main() {
 	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
 	apiVersionRouter.RegisterRoutes(userTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRoutes(tasksTransportHTTP.Routes()...)
+	apiVersionRouter.RegisterRoutes(statisticsTransportHTTP.Routes()...)
 
 	httpServer.RegisterAPIRouters(apiVersionRouter)
 
